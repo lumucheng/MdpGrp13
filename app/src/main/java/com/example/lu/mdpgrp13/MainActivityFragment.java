@@ -46,15 +46,6 @@ public class MainActivityFragment extends Fragment {
         initComponents(rootView);
 
         bluetoothAdapter  = BluetoothAdapter.getDefaultAdapter();
-//        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-//
-//        if (pairedDevices.size() > 0) {
-//            // Loop through paired devices
-//            for (BluetoothDevice device : pairedDevices) {
-//                // Add the name and address to an array adapter to show in a ListView
-//                bluetoothArrayAdapter.add(device.getName() + "\n" + device.getAddress());
-//            }
-//        }
 
         if (bluetoothAdapter  == null) {
             new AlertDialog.Builder(getActivity())
