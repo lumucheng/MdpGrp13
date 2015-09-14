@@ -2,6 +2,7 @@ package com.example.lu.mdpgrp13;
 
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,11 +13,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.w3c.dom.Text;
+
+import java.util.Set;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -25,6 +29,8 @@ public class MainActivityFragment extends Fragment {
 
     private final static int REQUEST_ENABLE_BT = 1;
     private BluetoothAdapter bluetoothAdapter ;
+    private ArrayAdapter<String> bluetoothArrayAdapter;
+
     private ImageView imgViewBluetooth;
     private TextView txtViewBluetooth;
     private Button btnBluetooth;
@@ -40,6 +46,15 @@ public class MainActivityFragment extends Fragment {
         initComponents(rootView);
 
         bluetoothAdapter  = BluetoothAdapter.getDefaultAdapter();
+//        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+//
+//        if (pairedDevices.size() > 0) {
+//            // Loop through paired devices
+//            for (BluetoothDevice device : pairedDevices) {
+//                // Add the name and address to an array adapter to show in a ListView
+//                bluetoothArrayAdapter.add(device.getName() + "\n" + device.getAddress());
+//            }
+//        }
 
         if (bluetoothAdapter  == null) {
             new AlertDialog.Builder(getActivity())
