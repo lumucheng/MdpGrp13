@@ -24,6 +24,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -34,7 +35,9 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter bluetoothAdapter;
     private ArrayAdapter<String> bluetoothArrayAdapter;
     private ArrayList<BluetoothDevice> bluetoothDeviceList;
-    private UUID uuid = UUID.fromString("eb3e4080-5ac9-11e5-a837-0800200c9a66");
+    private ConnectThread clientThread;
+    public ConnectedThread connectedThread = null;
+    private UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openBluetoothSearch() {
-
 
         bluetoothArrayAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.list_layout, R.id.listTextView);
         bluetoothDeviceList = new ArrayList<>();
@@ -112,12 +114,6 @@ public class MainActivity extends AppCompatActivity {
 
         AlertDialog dialog = onCreateDialog(savedInstanceState);
         dialog.show();
-
-//        AcceptThread hostThread = new AcceptThread();
-//        hostThread.run();
-//        final ProgressDialog progress = ProgressDialog.show(MainActivity.this, "dialog title",
-//                "dialog message", true);
-//        progress.show();
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -146,68 +142,18 @@ public class MainActivity extends AppCompatActivity {
         builder.setTitle("Select Device");
         builder.setAdapter(bluetoothArrayAdapter, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+
                 // Connecting as a Client
-                ConnectThread clientThread = new ConnectThread(bluetoothDeviceList.get(which));
-                Log.w("Device:", bluetoothDeviceList.get(which).getName());
+                clientThread = new ConnectThread(bluetoothDeviceList.get(which));
                 clientThread.run();
             }
         });
-
-         return builder.create();
+        return builder.create();
     }
 
-    // Bluetooth Connection setup as Host / Server
-    private class AcceptThread extends Thread {
-        private final BluetoothServerSocket mmServerSocket;
-
-        public AcceptThread() {
-            // Use a temporary object that is later assigned to mmServerSocket,
-            // because mmServerSocket is final
-            BluetoothServerSocket tmp = null;
-            try {
-                // MY_UUID is the app's UUID string, also used by the client code
-
-                tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord("MDPGrp13", uuid);
-            }
-            catch (IOException e) {
-            }
-
-            mmServerSocket = tmp;
-        }
-
-        public void run() {
-            BluetoothSocket socket = null;
-            // Keep listening until exception occurs or a socket is returned
-            while (true) {
-                try {
-                    socket = mmServerSocket.accept();
-                    Log.w("Testing", "Accepted");
-                } catch (IOException e) {
-                    break;
-                }
-                // If a connection was accepted
-                if (socket != null) {
-                    // Do work to manage the connection (in a separate thread)
-                    //manageConnectedSocket(socket);
-                    try {
-                        mmServerSocket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                }
-            }
-        }
-
-        /** Will cancel the listening socket, and cause the thread to finish */
-        public void cancel() {
-            try {
-                mmServerSocket.close();
-            } catch (IOException e) { }
-        }
-    }
-
-    private class ConnectThread extends Thread {
+    public class ConnectThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
 
@@ -236,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
                 // Connect the device through the socket. This will block
                 // until it succeeds or throws an exception
                 mmSocket.connect();
-                Log.w("Status", "Connected successfully");
+
 
             } catch (IOException connectException) {
                 // Unable to connect; close the socket and get out
@@ -251,6 +197,8 @@ public class MainActivity extends AppCompatActivity {
 
             // Do work to manage the connection (in a separate thread)
             //manageConnectedSocket(mmSocket);
+            connectedThread = new ConnectedThread(mmSocket);
+            connectedThread.run();
         }
 
         /** Will cancel an in-progress connection, and close the socket */
@@ -264,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class ConnectedThread extends Thread {
+    public class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
@@ -295,8 +243,12 @@ public class MainActivity extends AppCompatActivity {
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
                     // Send the obtained bytes to the UI activity
+
 //                    mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
 //                            .sendToTarget();
+                    String str = new String(buffer);
+                    Toast.makeText(getApplicationContext(), str, Toast.LENGTH_SHORT);
+
                 } catch (IOException e) {
                     break;
                 }

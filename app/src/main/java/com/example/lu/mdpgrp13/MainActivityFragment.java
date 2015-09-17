@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,7 +34,9 @@ public class MainActivityFragment extends Fragment {
 
     private ImageView imgViewBluetooth;
     private TextView txtViewBluetooth;
+    private EditText editTextCmd;
     private Button btnBluetooth;
+    private Button btnSendCmd;
 
     public MainActivityFragment() {
     }
@@ -77,7 +80,9 @@ public class MainActivityFragment extends Fragment {
     private void initComponents(View rootView) {
         imgViewBluetooth = (ImageView)rootView.findViewById(R.id.imgViewBluetooth);
         txtViewBluetooth = (TextView)rootView.findViewById(R.id.txtViewBluetooth);
+        editTextCmd = (EditText)rootView.findViewById(R.id.editTextCmd);
         btnBluetooth = (Button)rootView.findViewById(R.id.btnBluetooth);
+        btnSendCmd = (Button)rootView.findViewById(R.id.btnSendCmd);
 
         btnBluetooth.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,6 +93,15 @@ public class MainActivityFragment extends Fragment {
                 else {
                     bluetoothAdapter.enable();
                 }
+            }
+        });
+
+        btnSendCmd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = editTextCmd.getText().toString();
+                MainActivity mainActivity = (MainActivity) getActivity();
+                mainActivity.connectedThread.write(text.getBytes());
             }
         });
     }
