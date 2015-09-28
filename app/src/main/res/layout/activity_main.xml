@@ -1,6 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:focusable="true" android:focusableInTouchMode="true"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -37,42 +38,25 @@
         android:layout_alignRight="@+id/txtViewBluetooth"
         android:layout_alignEnd="@+id/txtViewBluetooth" />
 
-    <TextView
-        android:layout_width="100dp"
-        android:layout_height="25dp"
-        android:id="@+id/txtViewRobotLbl"
+    <FrameLayout
+        android:layout_width="610px"
+        android:layout_height="460px"
         android:layout_below="@+id/imgViewBluetooth"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="20dp"
-        android:text="Robot Status:" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/txtViewRobotStatus"
-        android:layout_alignTop="@+id/txtViewRobotLbl"
-        android:layout_alignLeft="@+id/btnSendCmd"
-        android:layout_alignStart="@+id/btnSendCmd" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Send Command"
-        android:id="@+id/btnSendCmd"
-        android:layout_alignBottom="@+id/btnBluetooth"
-        android:layout_toRightOf="@+id/btnBluetooth"
-        android:layout_toEndOf="@+id/btnBluetooth" />
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/frameMaze"
+        android:background="@drawable/border"></FrameLayout>
 
     <ImageButton
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:id="@+id/btnUp"
         android:src="@drawable/up"
-        android:layout_below="@+id/txtViewRobotLbl"
-        android:layout_toRightOf="@+id/txtViewRobotLbl"
-        android:layout_toEndOf="@+id/txtViewRobotLbl"
-        android:layout_marginTop="290dp"
+        android:layout_below="@+id/frameMaze"
+        android:layout_toRightOf="@+id/imgViewBluetooth"
+        android:layout_toEndOf="@+id/imgViewBluetooth"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
         android:onClick="moveUp"/>
@@ -96,7 +80,7 @@
         android:id="@+id/btnRight"
         android:layout_above="@+id/btnDown"
         android:layout_toRightOf="@+id/btnDown"
-        android:layout_marginLeft="25dp"
+        android:layout_marginLeft="10dp"
         android:layout_toEndOf="@+id/btnDown"
         android:src="@drawable/right"
         android:adjustViewBounds="true"
@@ -116,8 +100,8 @@
         android:onClick="moveDown"/>
 
     <Button
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="125dp"
+        android:layout_height="60dp"
         android:text="COMMAND 1"
         android:id="@+id/btnCmd1"
         android:layout_marginLeft="49dp"
@@ -128,8 +112,8 @@
         android:onClick="cmdOne"/>
 
     <Button
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="125dp"
+        android:layout_height="60dp"
         android:text="COMMAND 2"
         android:id="@+id/btnCmd2"
         android:layout_alignTop="@+id/btnCmd1"
@@ -137,5 +121,131 @@
         android:layout_toEndOf="@+id/btnCmd1"
         android:layout_marginLeft="15dp"
         android:onClick="cmdTwo"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtViewRobotLbl"
+        android:layout_below="@+id/btnDown"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="5dp"
+        android:text="Robot Status:"
+        android:textSize="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtViewRobotStatus"
+        android:textSize="20dp"
+        android:layout_alignTop="@+id/txtViewRobotLbl"
+        android:layout_toRightOf="@+id/txtViewRobotLbl"
+        android:layout_toEndOf="@+id/txtViewRobotLbl"
+        android:layout_marginLeft="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtViewSendTxt"
+        android:text="Send Text:"
+        android:textSize="20dp"
+        android:layout_below="@+id/txtViewRobotLbl"
+        android:layout_alignParentStart="@+id/txtViewRobotStatus"
+        android:layout_marginTop="20dp"/>
+
+    <EditText
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTxtTextCmd"
+        android:layout_alignBaseline="@+id/txtViewSendTxt"
+        android:layout_alignLeft="@+id/btnBluetooth"
+        android:layout_alignStart="@+id/btnBluetooth" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send"
+        android:id="@+id/btnSendCmd"
+        android:onClick="sendText"
+        android:layout_alignBottom="@+id/txtViewSendTxt"
+        android:layout_toRightOf="@+id/editTxtTextCmd"
+        android:layout_toEndOf="@+id/editTxtTextCmd" />
+
+    <Button
+        android:layout_width="125dp"
+        android:layout_height="60dp"
+        android:text="Begin Exploration"
+        android:id="@+id/btnBeginExploration"
+        android:onClick="beginExploration"
+        android:layout_below="@+id/btnRight"
+        android:layout_alignLeft="@+id/btnCmd1"
+        android:layout_alignStart="@+id/btnCmd1" />
+
+    <Button
+        android:layout_width="125dp"
+        android:layout_height="60dp"
+        android:text="Begin Shortest"
+        android:id="@+id/btnBeginShortest"
+        android:onClick="beginShortestPath"
+        android:layout_alignTop="@+id/btnBeginExploration"
+        android:layout_alignLeft="@+id/btnCmd2"
+        android:layout_alignStart="@+id/btnCmd2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtViewStartPosX"
+        android:text="Start X:"
+        android:textSize="20dp"
+        android:layout_below="@+id/txtViewSendTxt"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="20dp"/>
+
+    <EditText
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/editTxtStartPosX"
+        android:layout_below="@+id/txtViewSendTxt"
+        android:layout_toRightOf="@+id/txtViewStartPosX"
+        android:layout_toEndOf="@+id/txtViewStartPosX"
+        android:layout_marginTop="5dp"
+        android:text="0"
+        android:gravity="center_horizontal"/>
+
+    <TextView
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtViewStartPosY"
+        android:text="Start Y:"
+        android:textSize="20dp"
+        android:layout_alignBottom="@+id/txtViewStartPosX"
+        android:layout_alignLeft="@+id/txtViewRobotStatus"
+        android:layout_alignStart="@+id/txtViewRobotStatus"
+        android:layout_marginLeft="10dp"/>
+
+    <EditText
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/editTxtStartPosY"
+        android:layout_alignBottom="@+id/editTxtStartPosX"
+        android:layout_toRightOf="@+id/txtViewStartPosY"
+        android:layout_toEndOf="@+id/txtViewStartPosY"
+        android:text="0"
+        android:gravity="center_horizontal" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set"
+        android:id="@+id/btnSetCoor"
+        android:onClick="setCoordinates"
+        android:layout_alignBottom="@+id/editTxtStartPosY"
+        android:layout_toRightOf="@+id/editTxtStartPosY"
+        android:layout_toEndOf="@+id/editTxtStartPosY" />
 
 </RelativeLayout>

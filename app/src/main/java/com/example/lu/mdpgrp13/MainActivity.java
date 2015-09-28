@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,10 +48,17 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imgViewBluetooth;
     private TextView txtViewBluetooth;
     private TextView txtViewRobotStatus;
+    private EditText editTxtTextCmd;
+    private EditText editTxtStartPosX;
+    private EditText editTxtStartPosY;
     private Button btnBluetooth;
-    private Button btnSendCmd;
+    private FrameLayout frameMaze;
+    private PixelGridView pixelGridView;
 
     private Bundle savedInstanceState;
+    private int startPosX = 0;
+    private int startPosY = 0;
+    private double robotDirection = 0.0f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,8 +126,16 @@ public class MainActivity extends AppCompatActivity {
         imgViewBluetooth = (ImageView)findViewById(R.id.imgViewBluetooth);
         txtViewBluetooth = (TextView) findViewById(R.id.txtViewBluetooth);
         txtViewRobotStatus = (TextView) findViewById(R.id.txtViewRobotStatus);
+        editTxtStartPosX = (EditText) findViewById(R.id.editTxtStartPosX);
+        editTxtStartPosY = (EditText) findViewById(R.id.editTxtStartPosY);
+        editTxtTextCmd = (EditText) findViewById(R.id.editTxtTextCmd);
         btnBluetooth = (Button) findViewById(R.id.btnBluetooth);
-        btnSendCmd = (Button) findViewById(R.id.btnSendCmd);
+        frameMaze = (FrameLayout) findViewById(R.id.frameMaze);
+
+        pixelGridView = new PixelGridView(this);
+        pixelGridView.setNumColumns(20);
+        pixelGridView.setNumRows(15);
+        frameMaze.addView(pixelGridView);
 
         btnBluetooth.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,20 +144,6 @@ public class MainActivity extends AppCompatActivity {
                     bluetoothAdapter.disable();
                 } else {
                     bluetoothAdapter.enable();
-                }
-            }
-        });
-
-        btnSendCmd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if (connectionThread != null) {
-                    //connectionThread.write(editTextCmd.getText().toString().getBytes());
-                } else {
-                    Toast.makeText(getApplicationContext(),
-                            "Bluetooth connection not established/lost. Please connect to remote device",
-                            Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -307,6 +309,30 @@ public class MainActivity extends AppCompatActivity {
         sendBluetoothCommand("r");
     }
 
+    public void sendText(View view) {
+        String text = editTxtTextCmd.getText().toString();
+        sendBluetoothCommand(text);
+    }
+
+    public void beginExploration(View view) {
+        if ((startPosX == 0) || (startPosY == 0)) {
+            Toast.makeText(getApplicationContext(),
+                    "Please specify start position of robot.",
+                    Toast.LENGTH_SHORT).show();
+        }
+        else {
+            sendBluetoothCommand("beginExplore");
+        }
+    }
+
+    public void beginShortestPath(View view) {
+        startPosX = 1;
+        startPosY = 1;
+
+        // UPDATE ROBOT COORDINATES IN MAZE
+        sendBluetoothCommand("beginFastest");
+    }
+
     public void cmdOne(View view) {
         SharedPreferences sharedpreferences = getSharedPreferences(
                 CommandActivity.MDP_PREFERENCES, Context.MODE_PRIVATE);
@@ -325,6 +351,11 @@ public class MainActivity extends AppCompatActivity {
                 CommandActivity.COMMAND_2, "");
 
         sendBluetoothCommand(cmd2);
+    }
+
+    public void setCoordinates(View view) {
+        startPosX = Integer.parseInt(editTxtStartPosX.getText().toString());
+        startPosY = Integer.parseInt(editTxtStartPosY.getText().toString());
     }
 
     private void sendBluetoothCommand(String cmd) {
