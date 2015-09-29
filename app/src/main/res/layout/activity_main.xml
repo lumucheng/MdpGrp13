@@ -59,7 +59,8 @@
         android:layout_marginLeft="10dp"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
-        android:onClick="moveUp"/>
+        android:onClick="moveUp"
+        android:longClickable="true" />
 
     <ImageButton
         android:layout_width="75dp"
@@ -97,7 +98,30 @@
         android:src="@drawable/down"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
-        android:onClick="moveDown"/>
+        android:onClick="moveDown"
+        android:longClickable="true" />
+
+    <ToggleButton
+        android:id="@+id/toggleBtnMode"
+        android:layout_width="125dp"
+        android:layout_height="60dp"
+        android:textOn="Auto Mode"
+        android:textOff="Manual Mode"
+        android:onClick="onToggleClicked"
+        android:layout_below="@+id/frameMaze"
+        android:layout_marginTop="5dp"
+        android:layout_alignLeft="@+id/btnCmd1" />
+
+    <Button
+        android:layout_width="125dp"
+        android:layout_height="60dp"
+        android:text="UPDATE"
+        android:id="@+id/btnUpdate"
+        android:layout_marginLeft="15dp"
+        android:layout_marginStart="49dp"
+        android:layout_toRightOf="@+id/toggleBtnMode"
+        android:layout_alignTop="@+id/toggleBtnMode"
+        android:onClick="updateGrid"/>
 
     <Button
         android:layout_width="125dp"
@@ -212,7 +236,7 @@
         android:layout_toRightOf="@+id/txtViewStartPosX"
         android:layout_toEndOf="@+id/txtViewStartPosX"
         android:layout_marginTop="5dp"
-        android:text="0"
+        android:text="1"
         android:gravity="center_horizontal"/>
 
     <TextView
@@ -235,7 +259,7 @@
         android:layout_alignBottom="@+id/editTxtStartPosX"
         android:layout_toRightOf="@+id/txtViewStartPosY"
         android:layout_toEndOf="@+id/txtViewStartPosY"
-        android:text="0"
+        android:text="1"
         android:gravity="center_horizontal" />
 
     <Button

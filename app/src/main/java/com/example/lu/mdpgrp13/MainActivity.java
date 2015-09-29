@@ -3,7 +3,6 @@ package com.example.lu.mdpgrp13;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,24 +13,22 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,6 +49,11 @@ public class MainActivity extends AppCompatActivity {
     private EditText editTxtStartPosX;
     private EditText editTxtStartPosY;
     private Button btnBluetooth;
+    private Button btnUpdate;
+    private ImageButton btnUp;
+    private ImageButton btnDown;
+    private ImageButton btnLeft;
+    private ImageButton btnRight;
     private FrameLayout frameMaze;
     private PixelGridView pixelGridView;
 
@@ -60,11 +62,19 @@ public class MainActivity extends AppCompatActivity {
     private int startPosY = 0;
     private double robotDirection = 0.0f;
 
+    private Handler repeatUpdateHandler = new Handler();
+    private boolean forwardIncrement = false;
+    private boolean reverseIncrement = false;
+    private int incrementValue = 0;
+    private final static int REP_DELAY = 750;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         this.savedInstanceState = savedInstanceState;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        initComponents();
 
         bluetoothAdapter  = BluetoothAdapter.getDefaultAdapter();
 
@@ -130,6 +140,11 @@ public class MainActivity extends AppCompatActivity {
         editTxtStartPosY = (EditText) findViewById(R.id.editTxtStartPosY);
         editTxtTextCmd = (EditText) findViewById(R.id.editTxtTextCmd);
         btnBluetooth = (Button) findViewById(R.id.btnBluetooth);
+        btnUpdate = (Button) findViewById(R.id.btnUpdate);
+        btnUp = (ImageButton) findViewById(R.id.btnUp);
+        btnDown = (ImageButton) findViewById(R.id.btnDown);
+        btnLeft = (ImageButton) findViewById(R.id.btnLeft);
+        btnRight = (ImageButton) findViewById(R.id.btnRight);
         frameMaze = (FrameLayout) findViewById(R.id.frameMaze);
 
         pixelGridView = new PixelGridView(this);
@@ -145,6 +160,44 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     bluetoothAdapter.enable();
                 }
+            }
+        });
+
+        btnUp.setOnLongClickListener(
+                new View.OnLongClickListener() {
+                    public boolean onLongClick(View arg0) {
+                        forwardIncrement = true;
+                        repeatUpdateHandler.post(new RptUpdater());
+                        return false;
+                    }
+                }
+        );
+        btnUp.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                if ((event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL)
+                        && forwardIncrement) {
+                    forwardIncrement = false;
+                }
+                return false;
+            }
+        });
+
+        btnDown.setOnLongClickListener(
+                new View.OnLongClickListener() {
+                    public boolean onLongClick(View arg0) {
+                        reverseIncrement = true;
+                        repeatUpdateHandler.post(new RptUpdater());
+                        return false;
+                    }
+                }
+        );
+        btnDown.setOnTouchListener( new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                if ((event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL)
+                        && reverseIncrement) {
+                    reverseIncrement = false;
+                }
+                return false;
             }
         });
     }
@@ -275,6 +328,18 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    class RptUpdater implements Runnable {
+        public void run() {
+            if (forwardIncrement) {
+                moveUp(null);
+            }
+            else if (reverseIncrement){
+                moveDown(null);
+            }
+            repeatUpdateHandler.postDelayed( new RptUpdater(), REP_DELAY);
+        }
+    }
+
     public AlertDialog onCreateDialog(Bundle savedInstanceState) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -295,18 +360,22 @@ public class MainActivity extends AppCompatActivity {
 
     public void moveLeft(View view) {
         sendBluetoothCommand("tl");
+        pixelGridView.rotateRobot("tl");
     }
 
     public void moveRight(View view) {
         sendBluetoothCommand("tr");
+        pixelGridView.rotateRobot("tr");
     }
 
     public void moveUp(View view) {
         sendBluetoothCommand("f");
+        pixelGridView.moveRobot("f");
     }
 
     public void moveDown(View view) {
         sendBluetoothCommand("r");
+        pixelGridView.moveRobot("r");
     }
 
     public void sendText(View view) {
@@ -315,13 +384,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void beginExploration(View view) {
-        if ((startPosX == 0) || (startPosY == 0)) {
+        if ((startPosX < 1) || (startPosY < 1)) {
             Toast.makeText(getApplicationContext(),
                     "Please specify start position of robot.",
                     Toast.LENGTH_SHORT).show();
         }
         else {
-            sendBluetoothCommand("beginExplore");
+            String cmd = "be";
+
+            if (startPosX < 10) {
+                cmd += "0" + startPosX;
+            }
+            else {
+                cmd += startPosX;
+            }
+
+            if (startPosY < 10) {
+                cmd += "0" + startPosY;
+            }
+            else {
+                cmd += startPosY;
+            }
+
+            sendBluetoothCommand(cmd);
         }
     }
 
@@ -353,9 +438,28 @@ public class MainActivity extends AppCompatActivity {
         sendBluetoothCommand(cmd2);
     }
 
+    public void onToggleClicked(View view) {
+
+        boolean auto = ((ToggleButton)view).isChecked();
+
+        if (auto) {
+            btnUpdate.setEnabled(false);
+            // SEND ARENA INFO
+        }
+        else {
+            btnUpdate.setEnabled(true);
+        }
+    }
+
+    public void updateGrid(View view) {
+        // SEND "GRID" command to get data
+    }
+
     public void setCoordinates(View view) {
         startPosX = Integer.parseInt(editTxtStartPosX.getText().toString());
         startPosY = Integer.parseInt(editTxtStartPosY.getText().toString());
+
+        pixelGridView.setRobotStartPos(startPosX, startPosY, 10.0);
     }
 
     private void sendBluetoothCommand(String cmd) {
