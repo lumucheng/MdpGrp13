@@ -34,12 +34,15 @@ public class MainActivity extends AppCompatActivity {
 
     public final static int SOCKET_CONNECTED = 1;
     public final static int DATA_RECEIVED = 2;
-    public final static int ERROR_OCCURED = 3;
+    public final static int STATUS_RECEIVED = 3;
+    public final static int ERROR_OCCURED = 4;
 
     private BluetoothAdapter bluetoothAdapter;
     private ArrayAdapter<String> bluetoothArrayAdapter;
     private ArrayList<BluetoothDevice> bluetoothDeviceList;
     private ConnectionThread connectionThread;
+    private HostThread hostThread;
+    private boolean listenForConnection = false;
 
     // UI Components
     private ImageView imgViewBluetooth;
@@ -60,12 +63,10 @@ public class MainActivity extends AppCompatActivity {
     private Bundle savedInstanceState;
     private int startPosX = 0;
     private int startPosY = 0;
-    private double robotDirection = 0.0f;
 
     private Handler repeatUpdateHandler = new Handler();
     private boolean forwardIncrement = false;
     private boolean reverseIncrement = false;
-    private int incrementValue = 0;
     private final static int REP_DELAY = 750;
 
     @Override
@@ -315,13 +316,31 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
                 case DATA_RECEIVED: {
+                    //String data = (String)msg.obj;
+                    //txtViewRobotStatus.setText(data);
+                    break;
+                }
+                case STATUS_RECEIVED: {
                     String data = (String)msg.obj;
                     txtViewRobotStatus.setText(data);
                     break;
                 }
                 case ERROR_OCCURED: {
-                    String data = (String)msg.obj;
-                    Toast.makeText(getApplicationContext(), data, Toast.LENGTH_SHORT).show();
+                    if (listenForConnection) {
+                        String data = (String)msg.obj;
+                        Toast.makeText(getApplicationContext(),
+                                "Connection lost, will re-listen for connection now.",
+                                Toast.LENGTH_SHORT).show();
+
+                        hostThread.cancel();
+                        hostThread = new HostThread(handler, bluetoothAdapter);
+                        hostThread.run();
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(),
+                                "Connection lost. Please re-establish Bluetooth connection by SEARCH DEVICE.",
+                                Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 }
             }
@@ -347,15 +366,26 @@ public class MainActivity extends AppCompatActivity {
         builder.setAdapter(bluetoothArrayAdapter, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
 
+                listenForConnection = false;
                 dialog.dismiss();
-                bluetoothAdapter.cancelDiscovery();
 
+                bluetoothAdapter.cancelDiscovery();
                 BluetoothDevice device = bluetoothDeviceList.get(which);
                 ConnectThread clientThread = new ConnectThread(device, handler);
                 clientThread.run();
             }
         });
         return builder.create();
+    }
+
+    public void createSocket(View view) {
+        Toast.makeText(getApplicationContext(),
+                "Accepting Bluetooth connections now..",
+                Toast.LENGTH_SHORT).show();
+
+        listenForConnection = true;
+        hostThread = new HostThread(handler, bluetoothAdapter);
+        hostThread.run();
     }
 
     public void moveLeft(View view) {

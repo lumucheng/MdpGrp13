@@ -38,6 +38,16 @@
         android:layout_alignRight="@+id/txtViewBluetooth"
         android:layout_alignEnd="@+id/txtViewBluetooth" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="LISTEN FOR SOCKET"
+        android:id="@+id/btnCreateSocket"
+        android:layout_above="@+id/frameMaze"
+        android:layout_alignRight="@+id/frameMaze"
+        android:layout_alignEnd="@+id/frameMaze"
+        android:onClick="createSocket"/>
+
     <FrameLayout
         android:layout_width="610px"
         android:layout_height="460px"
@@ -271,5 +281,7 @@
         android:layout_alignBottom="@+id/editTxtStartPosY"
         android:layout_toRightOf="@+id/editTxtStartPosY"
         android:layout_toEndOf="@+id/editTxtStartPosY" />
+
+
 
 </RelativeLayout>

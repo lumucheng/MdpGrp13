@@ -2,6 +2,10 @@ package com.example.lu.mdpgrp13;
 
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,15 +44,29 @@ public class ConnectionThread extends Thread {
         while (true) {
             try {
 
-                // Read from the InputStream
                 bytes = mmInStream.read(buffer);
 
-                // Send the obtained bytes to the UI activity
                 String data = new String(buffer, 0, bytes);
-                handler.obtainMessage(MainActivity.DATA_RECEIVED, data).sendToTarget();
+
+                Log.w("DATA:" , data);
+
+                if (data.charAt(0) == '{') {
+                    try {
+                        JSONObject jsonObject = new JSONObject(data);
+
+                        if (!jsonObject.isNull("status")) {
+                            String status = jsonObject.getString("status");
+                            handler.obtainMessage(MainActivity.STATUS_RECEIVED, status).sendToTarget();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    handler.obtainMessage(MainActivity.DATA_RECEIVED, data).sendToTarget();
+                }
             }
             catch (IOException e) {
-                // send close socket message
                 handler.obtainMessage(MainActivity.ERROR_OCCURED,
                         "Error occured while receiving data: " + e.getMessage()).sendToTarget();
                 break;
