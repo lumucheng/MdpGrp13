@@ -50,7 +50,7 @@ public class ConnectionThread extends Thread {
 
                 Log.w("DATA:" , data);
 
-                if (data.charAt(0) == '{') {
+                if (data.charAt(0) == '{' && data.charAt(2) == 's') {
                     try {
                         JSONObject jsonObject = new JSONObject(data);
 

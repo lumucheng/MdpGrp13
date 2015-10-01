@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -74,8 +75,6 @@ public class MainActivity extends AppCompatActivity {
         this.savedInstanceState = savedInstanceState;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        initComponents();
 
         bluetoothAdapter  = BluetoothAdapter.getDefaultAdapter();
 
@@ -316,8 +315,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
                 case DATA_RECEIVED: {
-                    //String data = (String)msg.obj;
-                    //txtViewRobotStatus.setText(data);
+                    // Handle Map Descriptor here
+                    String data = (String)msg.obj;
+                    Log.w("Map", data);
                     break;
                 }
                 case STATUS_RECEIVED: {
@@ -482,7 +482,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateGrid(View view) {
-        // SEND "GRID" command to get data
+        sendBluetoothCommand("GRID");
     }
 
     public void setCoordinates(View view) {

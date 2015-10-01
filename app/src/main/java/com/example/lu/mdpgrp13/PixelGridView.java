@@ -82,8 +82,9 @@ public class PixelGridView extends View
     @Override
     protected void onDraw(Canvas canvas)
     {
-        super.onDraw(canvas);
+        Paint paint = new Paint();
 
+        super.onDraw(canvas);
         canvas.drawColor(Color.WHITE);
 
         if (numColumns == 0 || numRows == 0) {
@@ -112,16 +113,21 @@ public class PixelGridView extends View
             canvas.drawLine(0, i * CELL_HEIGHT, MAP_WIDTH, i * CELL_HEIGHT, blackPaint);
         }
 
+        // Draw Start and Goal Zone
+        Bitmap startImg = BitmapFactory.decodeResource(getResources(), R.drawable.start);
+        canvas.drawBitmap(startImg, 0, 0, paint);
+        Bitmap goalImg = BitmapFactory.decodeResource(getResources(), R.drawable.goal);
+        canvas.drawBitmap(goalImg, 17 * CELL_WIDTH, 12 * CELL_HEIGHT, paint);
+
         // Draw robot
         if (robotCenterX != -1 && robotCenterY != -1) {
-            Paint paint = new Paint();
+
             Matrix matrix = new Matrix();
             matrix.postRotate(robotAngle);
-
-            Bitmap img = BitmapFactory.decodeResource(getResources(), R.drawable.robot);
-            Bitmap rotatedBitmap = Bitmap.createBitmap(img , 0, 0, img.getWidth(), img.getHeight(), matrix, true);
-
-            canvas.drawBitmap(rotatedBitmap, robotCenterX * 30, robotCenterY * 30, paint);
+            Bitmap robotImg = BitmapFactory.decodeResource(getResources(), R.drawable.robot);
+            Bitmap rotatedBitmap = Bitmap.createBitmap(robotImg , 0, 0,
+                    robotImg.getWidth(), robotImg.getHeight(), matrix, true);
+            canvas.drawBitmap(rotatedBitmap, robotCenterX * CELL_WIDTH, robotCenterY * CELL_HEIGHT, paint);
         }
     }
 
