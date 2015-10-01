@@ -45,7 +45,6 @@ public class ConnectionThread extends Thread {
             try {
 
                 bytes = mmInStream.read(buffer);
-
                 String data = new String(buffer, 0, bytes);
 
                 Log.w("DATA:" , data);
@@ -63,7 +62,10 @@ public class ConnectionThread extends Thread {
                     }
                 }
                 else {
-                    handler.obtainMessage(MainActivity.DATA_RECEIVED, data).sendToTarget();
+                    if (data.charAt(0) == '{' && data.charAt(2) == 'g') {
+                        String gridInfo = data.substring(12, 86);
+                        handler.obtainMessage(MainActivity.DATA_RECEIVED, gridInfo).sendToTarget();
+                    }
                 }
             }
             catch (IOException e) {

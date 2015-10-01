@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -99,12 +100,12 @@ public class MainActivity extends AppCompatActivity {
             IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
             registerReceiver(btStatusReceiver, filter);
 
-            if (bluetoothAdapter.isEnabled()) {
-                displayBluetoothON();
-            }
-            else {
-                displayBluetoothOFF();
-            }
+//            if (bluetoothAdapter.isEnabled()) {
+//                displayBluetoothON();
+//            }
+//            else {
+//                displayBluetoothOFF();
+//            }
         }
     }
 
@@ -124,6 +125,9 @@ public class MainActivity extends AppCompatActivity {
             openBluetoothSearch();
             return true;
         }
+        else if (id == R.id.action_listen) {
+            createSocket(null);
+        }
         else if (id == R.id.action_setcommand) {
             openCommandActivity();
             return true;
@@ -133,13 +137,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initComponents() {
-        imgViewBluetooth = (ImageView)findViewById(R.id.imgViewBluetooth);
-        txtViewBluetooth = (TextView) findViewById(R.id.txtViewBluetooth);
+//        imgViewBluetooth = (ImageView)findViewById(R.id.imgViewBluetooth);
+//        txtViewBluetooth = (TextView) findViewById(R.id.txtViewBluetooth);
         txtViewRobotStatus = (TextView) findViewById(R.id.txtViewRobotStatus);
         editTxtStartPosX = (EditText) findViewById(R.id.editTxtStartPosX);
         editTxtStartPosY = (EditText) findViewById(R.id.editTxtStartPosY);
         editTxtTextCmd = (EditText) findViewById(R.id.editTxtTextCmd);
-        btnBluetooth = (Button) findViewById(R.id.btnBluetooth);
+//        btnBluetooth = (Button) findViewById(R.id.btnBluetooth);
         btnUpdate = (Button) findViewById(R.id.btnUpdate);
         btnUp = (ImageButton) findViewById(R.id.btnUp);
         btnDown = (ImageButton) findViewById(R.id.btnDown);
@@ -148,20 +152,20 @@ public class MainActivity extends AppCompatActivity {
         frameMaze = (FrameLayout) findViewById(R.id.frameMaze);
 
         pixelGridView = new PixelGridView(this);
-        pixelGridView.setNumColumns(20);
-        pixelGridView.setNumRows(15);
+        pixelGridView.setNumColumns(15);
+        pixelGridView.setNumRows(20);
         frameMaze.addView(pixelGridView);
 
-        btnBluetooth.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (bluetoothAdapter.isEnabled()) {
-                    bluetoothAdapter.disable();
-                } else {
-                    bluetoothAdapter.enable();
-                }
-            }
-        });
+//        btnBluetooth.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (bluetoothAdapter.isEnabled()) {
+//                    bluetoothAdapter.disable();
+//                } else {
+//                    bluetoothAdapter.enable();
+//                }
+//            }
+//        });
 
         btnUp.setOnLongClickListener(
                 new View.OnLongClickListener() {
@@ -222,20 +226,20 @@ public class MainActivity extends AppCompatActivity {
             if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
                 final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE,
                         BluetoothAdapter.ERROR);
-                switch (state) {
-                    case BluetoothAdapter.STATE_OFF:
-                        displayBluetoothOFF();
-                        break;
-                    case BluetoothAdapter.STATE_ON:
-                        displayBluetoothON();
-                        break;
-                    case BluetoothAdapter.STATE_DISCONNECTED:
-                        Toast.makeText(getApplicationContext(),
-                                "Bluetooth connection disconnected.",
-                                Toast.LENGTH_SHORT).show();
-                        connectionThread = null;
-                        break;
-                }
+//                switch (state) {
+//                    case BluetoothAdapter.STATE_OFF:
+//                        displayBluetoothOFF();
+//                        break;
+//                    case BluetoothAdapter.STATE_ON:
+//                        displayBluetoothON();
+//                        break;
+//                    case BluetoothAdapter.STATE_DISCONNECTED:
+//                        Toast.makeText(getApplicationContext(),
+//                                "Bluetooth connection disconnected.",
+//                                Toast.LENGTH_SHORT).show();
+//                        connectionThread = null;
+//                        break;
+//                }
             }
         }
     };
@@ -317,7 +321,13 @@ public class MainActivity extends AppCompatActivity {
                 case DATA_RECEIVED: {
                     // Handle Map Descriptor here
                     String data = (String)msg.obj;
-                    Log.w("Map", data);
+                    String grid = hex_to_binary(data);
+
+                    Log.w("Hex", data);
+                    Log.w("Hex Length", "" + data.length());
+                    Log.w("Bin", grid);
+                    Log.w("Bin Length", "" + grid.length());
+                    pixelGridView.drawObstacles(grid);
                     break;
                 }
                 case STATUS_RECEIVED: {
@@ -372,7 +382,7 @@ public class MainActivity extends AppCompatActivity {
                 bluetoothAdapter.cancelDiscovery();
                 BluetoothDevice device = bluetoothDeviceList.get(which);
                 ConnectThread clientThread = new ConnectThread(device, handler);
-                clientThread.run();
+                clientThread.start();
             }
         });
         return builder.create();
@@ -385,27 +395,35 @@ public class MainActivity extends AppCompatActivity {
 
         listenForConnection = true;
         hostThread = new HostThread(handler, bluetoothAdapter);
-        hostThread.run();
+        hostThread.start();
     }
 
     public void moveLeft(View view) {
-        sendBluetoothCommand("tl");
-        pixelGridView.rotateRobot("tl");
+        if (connectionThread != null) {
+            sendBluetoothCommand("tl");
+            pixelGridView.rotateRobot("tl");
+        }
     }
 
     public void moveRight(View view) {
-        sendBluetoothCommand("tr");
-        pixelGridView.rotateRobot("tr");
+        if (connectionThread != null) {
+            sendBluetoothCommand("tr");
+            pixelGridView.rotateRobot("tr");
+        }
     }
 
     public void moveUp(View view) {
-        sendBluetoothCommand("f");
-        pixelGridView.moveRobot("f");
+        if (connectionThread != null) {
+            sendBluetoothCommand("f");
+            pixelGridView.moveRobot("f");
+        }
     }
 
     public void moveDown(View view) {
-        sendBluetoothCommand("r");
-        pixelGridView.moveRobot("r");
+        if (connectionThread != null) {
+            sendBluetoothCommand("r");
+            pixelGridView.moveRobot("r");
+        }
     }
 
     public void sendText(View view) {
@@ -502,5 +520,29 @@ public class MainActivity extends AppCompatActivity {
                     "Bluetooth connection not established. Please connect to remote device",
                     Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public String hex_to_binary(String hex) {
+        String hex_char,bin_char,binary;
+        binary = "";
+        int len = hex.length()/2;
+        for(int i=0;i<len;i++){
+            hex_char = hex.substring(2*i,2*i+2);
+            int conv_int = Integer.parseInt(hex_char,16);
+            bin_char = Integer.toBinaryString(conv_int);
+            bin_char = zero_pad_bin_char(bin_char);
+            if(i==0) binary = bin_char;
+            else binary = binary+bin_char;
+            //out.printf("%s %s\n", hex_char,bin_char);
+        }
+        return binary;
+    }
+
+    private String zero_pad_bin_char(String bin_char){
+        int len = bin_char.length();
+        if(len == 8) return bin_char;
+        String zero_pad = "0";
+        for(int i=1;i<8-len;i++) zero_pad = zero_pad + "0";
+        return zero_pad + bin_char;
     }
 }

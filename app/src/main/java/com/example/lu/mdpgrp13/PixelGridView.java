@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -16,8 +17,8 @@ import android.view.View;
  */
 public class PixelGridView extends View
 {
-    private static final int MAP_HEIGHT = 450;
-    private static final int MAP_WIDTH = 600;
+    private static final int MAP_HEIGHT = 600;
+    private static final int MAP_WIDTH = 450;
     private static final int CELL_WIDTH = 30;
     private static final int CELL_HEIGHT = 30;
 
@@ -74,7 +75,7 @@ public class PixelGridView extends View
         if (numColumns == 0 || numRows == 0)
             return;
 
-        cellChecked = new boolean[numColumns][numRows];
+        cellChecked = new boolean[numRows][numColumns];
 
         invalidate();
     }
@@ -91,14 +92,21 @@ public class PixelGridView extends View
             return;
         }
 
+        // Draw Start and Goal Zone
+        Bitmap startImg = BitmapFactory.decodeResource(getResources(), R.drawable.start);
+        canvas.drawBitmap(startImg, 0, 0, paint);
+        Bitmap goalImg = BitmapFactory.decodeResource(getResources(), R.drawable.goal);
+        canvas.drawBitmap(goalImg, 13 * CELL_WIDTH, 18 * CELL_HEIGHT, paint);
+
         // Draw obstacles here
-        for (int i = 0; i < numColumns; i++)
+        for (int i = 0; i < numRows; i++)
         {
-            for (int j = 0; j < numRows; j++)
+            for (int j = 0; j < numColumns; j++)
             {
                 if (cellChecked[i][j])
                 {
-                    canvas.drawRect(i * CELL_WIDTH, j * CELL_HEIGHT, (i + 1) * CELL_WIDTH, (j + 1) * CELL_HEIGHT, blackPaint);
+                    canvas.drawRect(j * CELL_WIDTH, i * CELL_HEIGHT, (j + 1) * CELL_WIDTH, (i + 1) * CELL_HEIGHT, blackPaint);
+                    // left top right bottom
                 }
             }
         }
@@ -112,12 +120,6 @@ public class PixelGridView extends View
         {
             canvas.drawLine(0, i * CELL_HEIGHT, MAP_WIDTH, i * CELL_HEIGHT, blackPaint);
         }
-
-        // Draw Start and Goal Zone
-        Bitmap startImg = BitmapFactory.decodeResource(getResources(), R.drawable.start);
-        canvas.drawBitmap(startImg, 0, 0, paint);
-        Bitmap goalImg = BitmapFactory.decodeResource(getResources(), R.drawable.goal);
-        canvas.drawBitmap(goalImg, 17 * CELL_WIDTH, 12 * CELL_HEIGHT, paint);
 
         // Draw robot
         if (robotCenterX != -1 && robotCenterY != -1) {
@@ -216,6 +218,32 @@ public class PixelGridView extends View
         robotCenterY = centerY;
         angle = robotAngle;
 
+        invalidate();
+    }
+
+    public void drawObstacles(String grid) {
+
+        int index = 0;
+
+        Log.w("Length", "" + grid.length());
+
+        for (int i = 0; i < numRows; i++)
+        {
+            for (int j = 0; j < numColumns; j++)
+            {
+                if (index < grid.length()) {
+                    char cell = grid.charAt(index);
+
+                    if (cell == '0') {
+                        cellChecked[i][j] = false;
+                    }
+                    else {
+                        cellChecked[i][j] = true;
+                    }
+                    index++;
+                }
+            }
+        }
         invalidate();
     }
 }

@@ -7,52 +7,10 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.example.lu.mdpgrp13.MainActivity">
 
-    <ImageView
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:id="@+id/imgViewBluetooth"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:src="@drawable/bluetooth_bw" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Bluetooth Status:"
-        android:id="@+id/txtViewBluetooth"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/imgViewBluetooth"
-        android:layout_marginLeft="21dp"
-        android:layout_marginStart="21dp" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Turn on Bluetooth"
-        android:id="@+id/btnBluetooth"
-        android:layout_alignBottom="@+id/imgViewBluetooth"
-        android:layout_alignLeft="@+id/txtViewBluetooth"
-        android:layout_alignStart="@+id/txtViewBluetooth"
-        android:layout_alignRight="@+id/txtViewBluetooth"
-        android:layout_alignEnd="@+id/txtViewBluetooth" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="LISTEN FOR SOCKET"
-        android:id="@+id/btnCreateSocket"
-        android:layout_above="@+id/frameMaze"
-        android:layout_alignRight="@+id/frameMaze"
-        android:layout_alignEnd="@+id/frameMaze"
-        android:onClick="createSocket"/>
-
     <FrameLayout
-        android:layout_width="610px"
-        android:layout_height="460px"
-        android:layout_below="@+id/imgViewBluetooth"
-        android:layout_marginTop="10dp"
+        android:layout_width="460px"
+        android:layout_height="610px"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/frameMaze"
         android:background="@drawable/border"></FrameLayout>
@@ -63,8 +21,7 @@
         android:id="@+id/btnUp"
         android:src="@drawable/up"
         android:layout_below="@+id/frameMaze"
-        android:layout_toRightOf="@+id/imgViewBluetooth"
-        android:layout_toEndOf="@+id/imgViewBluetooth"
+        android:layout_toEndOf="@+id/btnLeft"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
         android:adjustViewBounds="true"
@@ -163,15 +120,14 @@
         android:layout_below="@+id/btnDown"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="5dp"
         android:text="Robot Status:"
-        android:textSize="20dp"/>
+        android:textSize="18dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txtViewRobotStatus"
-        android:textSize="20dp"
+        android:textSize="18dp"
         android:layout_alignTop="@+id/txtViewRobotLbl"
         android:layout_toRightOf="@+id/txtViewRobotLbl"
         android:layout_toEndOf="@+id/txtViewRobotLbl"
@@ -182,18 +138,17 @@
         android:layout_height="wrap_content"
         android:id="@+id/txtViewSendTxt"
         android:text="Send Text:"
-        android:textSize="20dp"
+        android:textSize="18dp"
         android:layout_below="@+id/txtViewRobotLbl"
         android:layout_alignParentStart="@+id/txtViewRobotStatus"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="5dp"/>
 
     <EditText
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:id="@+id/editTxtTextCmd"
         android:layout_alignBaseline="@+id/txtViewSendTxt"
-        android:layout_alignLeft="@+id/btnBluetooth"
-        android:layout_alignStart="@+id/btnBluetooth" />
+        android:layout_toRightOf="@+id/txtViewSendTxt"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -201,7 +156,7 @@
         android:text="Send"
         android:id="@+id/btnSendCmd"
         android:onClick="sendText"
-        android:layout_alignBottom="@+id/txtViewSendTxt"
+        android:layout_alignBaseline="@+id/editTxtTextCmd"
         android:layout_toRightOf="@+id/editTxtTextCmd"
         android:layout_toEndOf="@+id/editTxtTextCmd" />
 
@@ -229,11 +184,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txtViewStartPosX"
-        android:text="Start X:"
-        android:textSize="20dp"
-        android:layout_below="@+id/txtViewSendTxt"
+        android:text="X:"
+        android:textSize="18dp"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/editTxtStartPosX"
         android:layout_marginTop="20dp"/>
 
     <EditText
@@ -250,14 +204,13 @@
         android:gravity="center_horizontal"/>
 
     <TextView
-        android:layout_width="70dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txtViewStartPosY"
-        android:text="Start Y:"
-        android:textSize="20dp"
+        android:text="Y:"
+        android:textSize="18dp"
         android:layout_alignBottom="@+id/txtViewStartPosX"
-        android:layout_alignLeft="@+id/txtViewRobotStatus"
-        android:layout_alignStart="@+id/txtViewRobotStatus"
+        android:layout_toRightOf="@+id/editTxtStartPosX"
         android:layout_marginLeft="10dp"/>
 
     <EditText
@@ -278,9 +231,9 @@
         android:text="Set"
         android:id="@+id/btnSetCoor"
         android:onClick="setCoordinates"
-        android:layout_alignBottom="@+id/editTxtStartPosY"
         android:layout_toRightOf="@+id/editTxtStartPosY"
-        android:layout_toEndOf="@+id/editTxtStartPosY" />
+        android:layout_toEndOf="@+id/editTxtStartPosY"
+        android:layout_alignBaseline="@+id/editTxtStartPosY"/>
 
 
 

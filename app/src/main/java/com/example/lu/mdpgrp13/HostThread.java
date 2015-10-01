@@ -12,7 +12,7 @@ import java.util.UUID;
 /**
  * Created by Mucheng on 30/9/15.
  */
-public class HostThread {
+public class HostThread extends Thread {
 
     private BluetoothServerSocket mmServerSocket = null;
     private UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
