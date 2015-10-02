@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
-import android.util.Log;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -27,7 +26,7 @@ public class HostThread extends Thread {
             mmServerSocket = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME, uuid);
         }
         catch (IOException e) {
-            handler.obtainMessage(MainActivity.ERROR_OCCURED, "Error occured while connecting: "
+            handler.obtainMessage(MainActivity.ERROR_OCCURRED, "Error occured while connecting: "
                     + e.getMessage()).sendToTarget();
         }
     }
@@ -44,7 +43,7 @@ public class HostThread extends Thread {
                 break;
             }
             catch (IOException e) {
-                handler.obtainMessage(MainActivity.ERROR_OCCURED, "Error occured while connecting: "
+                handler.obtainMessage(MainActivity.ERROR_OCCURRED, "Error occured while connecting: "
                         + e.getMessage()).sendToTarget();
                 break;
             }
@@ -57,7 +56,7 @@ public class HostThread extends Thread {
             mmServerSocket.close();
         }
         catch (IOException e) {
-            handler.obtainMessage(MainActivity.ERROR_OCCURED, "Cancel thread error: "
+            handler.obtainMessage(MainActivity.ERROR_OCCURRED, "Cancel thread error: "
                     + e.getMessage()).sendToTarget();
         }
     }

@@ -41,7 +41,7 @@ public class ConnectThread extends Thread {
         }
         catch (IOException connectException) {
 
-            handler.obtainMessage(MainActivity.ERROR_OCCURED, "Error occured while connecting: "
+            handler.obtainMessage(MainActivity.ERROR_OCCURRED, "Error occured while connecting: "
                     + connectException.getMessage()).sendToTarget();
 
             try {

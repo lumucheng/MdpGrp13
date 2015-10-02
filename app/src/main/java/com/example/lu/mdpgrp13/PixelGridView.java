@@ -105,8 +105,8 @@ public class PixelGridView extends View
             {
                 if (cellChecked[i][j])
                 {
-                    canvas.drawRect(j * CELL_WIDTH, i * CELL_HEIGHT, (j + 1) * CELL_WIDTH, (i + 1) * CELL_HEIGHT, blackPaint);
-                    // left top right bottom
+                    canvas.drawRect(j * CELL_WIDTH, i * CELL_HEIGHT,
+                            (j + 1) * CELL_WIDTH, (i + 1) * CELL_HEIGHT, blackPaint);
                 }
             }
         }
@@ -132,21 +132,6 @@ public class PixelGridView extends View
             canvas.drawBitmap(rotatedBitmap, robotCenterX * CELL_WIDTH, robotCenterY * CELL_HEIGHT, paint);
         }
     }
-
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event)
-//    {
-//        if (event.getAction() != MotionEvent.ACTION_DOWN)
-//            return true;
-//
-//        int column = (int)(event.getX() / CELL_WIDTH);
-//        int row = (int)(event.getY() / CELL_HEIGHT);
-//
-//        cellChecked[column][row] = !cellChecked[column][row];
-//        invalidate();
-//
-//        return true;
-//    }
 
     public void setRobotStartPos(int startX, int startY, double angle) {
         robotCenterX = startX - 1;
@@ -224,8 +209,6 @@ public class PixelGridView extends View
     public void drawObstacles(String grid) {
 
         int index = 0;
-
-        Log.w("Length", "" + grid.length());
 
         for (int i = 0; i < numRows; i++)
         {

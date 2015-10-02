@@ -49,6 +49,7 @@ public class ConnectionThread extends Thread {
 
                 Log.w("DATA:" , data);
 
+                //TODO Change according to Algorithm specified String
                 if (data.charAt(0) == '{' && data.charAt(2) == 's') {
                     try {
                         JSONObject jsonObject = new JSONObject(data);
@@ -62,6 +63,7 @@ public class ConnectionThread extends Thread {
                     }
                 }
                 else {
+                    //TODO same as above, remember to change accordingly
                     if (data.charAt(0) == '{' && data.charAt(2) == 'g') {
                         String gridInfo = data.substring(12, 86);
                         handler.obtainMessage(MainActivity.DATA_RECEIVED, gridInfo).sendToTarget();
@@ -69,7 +71,7 @@ public class ConnectionThread extends Thread {
                 }
             }
             catch (IOException e) {
-                handler.obtainMessage(MainActivity.ERROR_OCCURED,
+                handler.obtainMessage(MainActivity.ERROR_OCCURRED,
                         "Error occured while receiving data: " + e.getMessage()).sendToTarget();
                 break;
             }
@@ -82,7 +84,7 @@ public class ConnectionThread extends Thread {
             mmOutStream.write(bytes);
         }
         catch (IOException e) {
-            handler.obtainMessage(MainActivity.ERROR_OCCURED,
+            handler.obtainMessage(MainActivity.ERROR_OCCURRED,
                     "Error occured while sending data").sendToTarget();
         }
     }
