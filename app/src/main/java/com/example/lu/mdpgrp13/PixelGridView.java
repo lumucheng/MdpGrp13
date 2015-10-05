@@ -1,5 +1,6 @@
 package com.example.lu.mdpgrp13;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,10 +8,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 /**
  * Created by Mucheng on 28/9/15.
@@ -21,6 +23,8 @@ public class PixelGridView extends View
     private static final int MAP_WIDTH = 450;
     private static final int CELL_WIDTH = 30;
     private static final int CELL_HEIGHT = 30;
+    private static final int NUM_COLS = 15;
+    private static final int NUM_ROWS = 20;
 
     private int robotCenterX = -1;
     private int robotCenterY = -1;
@@ -33,6 +37,14 @@ public class PixelGridView extends View
     public PixelGridView(Context context)
     {
         this(context, null);
+
+        cellChecked = new boolean[NUM_ROWS][NUM_COLS];
+
+        for (int i = 0; i < NUM_ROWS; i++) {
+            for (int j = 0; j < NUM_COLS; j++) {
+                cellChecked[i][j] = false;
+            }
+        }
     }
 
     public PixelGridView(Context context, AttributeSet attrs)
@@ -88,20 +100,16 @@ public class PixelGridView extends View
         super.onDraw(canvas);
         canvas.drawColor(Color.WHITE);
 
-        if (numColumns == 0 || numRows == 0) {
-            return;
-        }
-
         // Draw Start and Goal Zone
         Bitmap startImg = BitmapFactory.decodeResource(getResources(), R.drawable.start);
         canvas.drawBitmap(startImg, 0, 0, paint);
         Bitmap goalImg = BitmapFactory.decodeResource(getResources(), R.drawable.goal);
-        canvas.drawBitmap(goalImg, 13 * CELL_WIDTH, 18 * CELL_HEIGHT, paint);
+        canvas.drawBitmap(goalImg, 12 * CELL_WIDTH, 17 * CELL_HEIGHT, paint);
 
         // Draw obstacles here
-        for (int i = 0; i < numRows; i++)
+        for (int i = 0; i < NUM_ROWS; i++)
         {
-            for (int j = 0; j < numColumns; j++)
+            for (int j = 0; j < NUM_COLS; j++)
             {
                 if (cellChecked[i][j])
                 {
@@ -112,11 +120,11 @@ public class PixelGridView extends View
         }
 
         // Draw grid lines
-        for (int i = 1; i < numColumns; i++)
+        for (int i = 1; i < NUM_COLS; i++)
         {
             canvas.drawLine(i * CELL_WIDTH, 0, i * CELL_WIDTH, MAP_HEIGHT, blackPaint);
         }
-        for (int i = 1; i < numRows; i++)
+        for (int i = 1; i < NUM_ROWS; i++)
         {
             canvas.drawLine(0, i * CELL_HEIGHT, MAP_WIDTH, i * CELL_HEIGHT, blackPaint);
         }
@@ -131,6 +139,8 @@ public class PixelGridView extends View
                     robotImg.getWidth(), robotImg.getHeight(), matrix, true);
             canvas.drawBitmap(rotatedBitmap, robotCenterX * CELL_WIDTH, robotCenterY * CELL_HEIGHT, paint);
         }
+
+        postInvalidateDelayed(300);
     }
 
     public void setRobotStartPos(int startX, int startY, double angle) {
@@ -140,20 +150,20 @@ public class PixelGridView extends View
     }
 
     public void rotateRobot(String rotateCommand) {
-        if (rotateCommand == "tl") { //
-            if (robotAngle == 0) {
-                robotAngle = 270;
-            }
-            else {
-                robotAngle -= 90;
-            }
-        }
-        else {
+        if (rotateCommand == "l") {
             if (robotAngle == 270) {
                 robotAngle = 0;
             }
             else {
                 robotAngle += 90;
+            }
+        }
+        else {
+            if (robotAngle == 0) {
+                robotAngle = 270;
+            }
+            else {
+                robotAngle -= 90;
             }
         }
 
@@ -164,13 +174,13 @@ public class PixelGridView extends View
         if (cmd == "f") {
             switch (robotAngle) {
                 case 0:
-                    robotCenterY -= 1;
+                    robotCenterY += 1;
                     break;
                 case 90:
                     robotCenterX += 1;
                     break;
                 case 180:
-                    robotCenterY += 1;
+                    robotCenterY -= 1;
                     break;
                 case 270:
                     robotCenterX -= 1;
@@ -210,9 +220,9 @@ public class PixelGridView extends View
 
         int index = 0;
 
-        for (int i = 0; i < numRows; i++)
+        for (int i = 0; i < NUM_ROWS; i++)
         {
-            for (int j = 0; j < numColumns; j++)
+            for (int j = 0; j < NUM_COLS; j++)
             {
                 if (index < grid.length()) {
                     char cell = grid.charAt(index);
@@ -227,6 +237,21 @@ public class PixelGridView extends View
                 }
             }
         }
+        invalidate();
+    }
+
+    public void addObstacle(String obstacle) {
+
+        //"o:0101"
+
+        String xCoordStr = obstacle.substring(0,1);
+        String yCoordStr = obstacle.substring(2,3);
+
+        int xCoord = Integer.parseInt(xCoordStr);
+        int yCoord = Integer.parseInt(yCoordStr);
+
+        cellChecked[xCoord][yCoord] = true;
+
         invalidate();
     }
 }

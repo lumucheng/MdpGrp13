@@ -37,10 +37,9 @@ public class ConnectionThread extends Thread {
     }
 
     public void run() {
-        byte[] buffer = new byte[1024];  // buffer store for the stream
-        int bytes; // bytes returned from read()
+        byte[] buffer = new byte[1024];
+        int bytes;
 
-        // Keep listening to the InputStream until an exception occurs
         while (true) {
             try {
 
@@ -49,25 +48,36 @@ public class ConnectionThread extends Thread {
 
                 Log.w("DATA:" , data);
 
-                //TODO Change according to Algorithm specified String
-                if (data.charAt(0) == '{' && data.charAt(2) == 's') {
-                    try {
-                        JSONObject jsonObject = new JSONObject(data);
+//                //TODO Change according to Algorithm specified String
+//                if (data.charAt(0) == '{' && data.charAt(2) == 's') {
+//                    try {
+//                        JSONObject jsonObject = new JSONObject(data);
+//
+//                        if (!jsonObject.isNull("status")) {
+//                            String status = jsonObject.getString("status");
+//                            handler.obtainMessage(MainActivity.STATUS_RECEIVED, status).sendToTarget();
+//                        }
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                else {
+//                    //TODO same as above, remember to change accordingly
+//                    if (data.charAt(0) == '{' && data.charAt(2) == 'g') {
+//                        String gridInfo = data.substring(12, 86);
+//                        handler.obtainMessage(MainActivity.DATA_RECEIVED, gridInfo).sendToTarget();
+//                    }
+//                }
 
-                        if (!jsonObject.isNull("status")) {
-                            String status = jsonObject.getString("status");
-                            handler.obtainMessage(MainActivity.STATUS_RECEIVED, status).sendToTarget();
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                if (data.charAt(0) == 'r' || data.charAt(0) == 'l' || data.charAt(0) == 'f') {
+                    handler.obtainMessage(MainActivity.ROBOT_MOVEMENT, data).sendToTarget();
+                }
+                else if (data.charAt(0) == 'o') {
+                    String obstacle = data.substring(2);
+                    handler.obtainMessage(MainActivity.OBSTACLE_DATA, obstacle).sendToTarget();
                 }
                 else {
-                    //TODO same as above, remember to change accordingly
-                    if (data.charAt(0) == '{' && data.charAt(2) == 'g') {
-                        String gridInfo = data.substring(12, 86);
-                        handler.obtainMessage(MainActivity.DATA_RECEIVED, gridInfo).sendToTarget();
-                    }
+                    handler.obtainMessage(MainActivity.STATUS_RECEIVED, data).sendToTarget();
                 }
             }
             catch (IOException e) {

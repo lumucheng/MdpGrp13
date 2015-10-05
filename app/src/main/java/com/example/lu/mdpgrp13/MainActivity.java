@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -35,7 +36,9 @@ public class MainActivity extends AppCompatActivity {
     public final static int SOCKET_CONNECTED = 1;
     public final static int DATA_RECEIVED = 2;
     public final static int STATUS_RECEIVED = 3;
-    public final static int ERROR_OCCURRED = 4;
+    public final static int ROBOT_MOVEMENT = 4;
+    public final static int OBSTACLE_DATA = 5;
+    public final static int ERROR_OCCURRED = 6;
 
     private BluetoothAdapter bluetoothAdapter;
     private ArrayAdapter<String> bluetoothArrayAdapter;
@@ -135,8 +138,6 @@ public class MainActivity extends AppCompatActivity {
         frameMaze = (FrameLayout) findViewById(R.id.frameMaze);
 
         pixelGridView = new PixelGridView(this);
-        pixelGridView.setNumColumns(15);
-        pixelGridView.setNumRows(20);
         frameMaze.addView(pixelGridView);
 
         btnUp.setOnLongClickListener(
@@ -249,7 +250,9 @@ public class MainActivity extends AppCompatActivity {
             switch(msg.what) {
                 case SOCKET_CONNECTED: {
                     connectionThread = (ConnectionThread)msg.obj;
-                    Toast.makeText(getApplicationContext(), "Bluetooth connection established.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),
+                            "Bluetooth connection established.",
+                            Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case DATA_RECEIVED: {
@@ -267,9 +270,67 @@ public class MainActivity extends AppCompatActivity {
                     txtViewRobotStatus.setText(data);
                     break;
                 }
+                case ROBOT_MOVEMENT: {
+                    String movement = (String)msg.obj;
+
+                    int charIndex = 0;
+                    int count = 0;
+                    char command = '\0';
+
+                    if (movement.length() ==  1) {
+                        if (movement.charAt(0) == 'f') {
+                            pixelGridView.moveRobot("f");
+                        }
+                        else {
+                            pixelGridView.rotateRobot(movement);
+                        }
+                    }
+                    else {
+                        while (charIndex < movement.length()) {
+
+                            // Not digit
+                            if (!(movement.charAt(charIndex) >= '0' && movement.charAt(charIndex) <= '9')) {
+                                command = movement.charAt(charIndex);
+                            }
+                            else { // Digit
+
+                                int startIndex = charIndex;
+                                int endIndex = charIndex;
+                                while (endIndex < movement.length()
+                                        && movement.charAt(endIndex) >= '0'
+                                        && movement.charAt(endIndex) <= '9') {
+
+                                    if (!(movement.charAt(endIndex) >= '0' &&
+                                            movement.charAt(endIndex) <= '9')) {
+                                        break;
+                                    }
+                                    endIndex++;
+                                }
+
+                                String subString = movement.substring(startIndex, endIndex);
+                                int number = Integer.parseInt(subString);
+
+                                Log.w("Command", command + "");
+                                Log.w("Command", number +"");
+
+                                for (int i = 0; i < number; i++) {
+                                    final Handler handler = new Handler();
+                                    count++;
+                                    handler.postDelayed(new RobotMovementRunnable(pixelGridView, command), 200 * count);
+                                }
+                            }
+                            charIndex++;
+                        }
+                    }
+                    break;
+                }
+                case OBSTACLE_DATA: {
+                    String obstacle = (String)msg.obj;
+                    pixelGridView.addObstacle(obstacle);
+                    break;
+                }
                 case ERROR_OCCURRED: {
                     if (listenForConnection) {
-                        String data = (String)msg.obj;
                         Toast.makeText(getApplicationContext(),
                                 "Connection lost, will re-listen for connection now.",
                                 Toast.LENGTH_SHORT).show();
@@ -332,15 +393,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void moveLeft(View view) {
         if (connectionThread != null) {
-            sendBluetoothCommand("tl");
-            pixelGridView.rotateRobot("tl");
+            sendBluetoothCommand("l");
+            pixelGridView.rotateRobot("l");
         }
     }
 
     public void moveRight(View view) {
         if (connectionThread != null) {
-            sendBluetoothCommand("tr");
-            pixelGridView.rotateRobot("tr");
+            sendBluetoothCommand("r");
+            pixelGridView.rotateRobot("r");
         }
     }
 
