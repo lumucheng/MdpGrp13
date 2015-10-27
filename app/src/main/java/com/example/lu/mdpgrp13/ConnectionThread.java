@@ -69,16 +69,18 @@ public class ConnectionThread extends Thread {
 //                    }
 //                }
 
-                if (data.charAt(0) == 'r' || data.charAt(0) == 'l' || data.charAt(0) == 'f') {
-                    handler.obtainMessage(MainActivity.ROBOT_MOVEMENT, data).sendToTarget();
-                }
-                else if (data.charAt(0) == 'o') {
-                    String obstacle = data.substring(2);
-                    handler.obtainMessage(MainActivity.OBSTACLE_DATA, obstacle).sendToTarget();
-                }
-                else {
-                    handler.obtainMessage(MainActivity.STATUS_RECEIVED, data).sendToTarget();
-                }
+//                if (data.charAt(0) == 'r' || data.charAt(0) == 'l' || data.charAt(0) == 'f') {
+//                    handler.obtainMessage(MainActivity.ROBOT_MOVEMENT, data).sendToTarget();
+//                }
+//                else if (data.charAt(0) == 'o') {
+//                    String obstacle = data.substring(2);
+//                    handler.obtainMessage(MainActivity.OBSTACLE_DATA, obstacle).sendToTarget();
+//                }
+//                else {
+//                    handler.obtainMessage(MainActivity.STATUS_RECEIVED, data).sendToTarget();
+//                }
+
+                handler.obtainMessage(MainActivity.STATUS_RECEIVED, data).sendToTarget();
             }
             catch (IOException e) {
                 handler.obtainMessage(MainActivity.ERROR_OCCURRED,

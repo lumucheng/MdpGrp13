@@ -431,21 +431,21 @@ public class MainActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT).show();
         }
         else {
-            String cmd = "be";
+            String cmd = "ee";
 
-            if (startPosX < 10) {
-                cmd += "0" + startPosX;
-            }
-            else {
-                cmd += startPosX;
-            }
-
-            if (startPosY < 10) {
-                cmd += "0" + startPosY;
-            }
-            else {
-                cmd += startPosY;
-            }
+//            if (startPosX < 10) {
+//                cmd += "0" + startPosX;
+//            }
+//            else {
+//                cmd += startPosX;
+//            }
+//
+//            if (startPosY < 10) {
+//                cmd += "0" + startPosY;
+//            }
+//            else {
+//                cmd += startPosY;
+//            }
 
             sendBluetoothCommand(cmd);
         }
@@ -456,7 +456,7 @@ public class MainActivity extends AppCompatActivity {
         startPosY = 1;
 
         // UPDATE ROBOT COORDINATES IN MAZE
-        sendBluetoothCommand("beginFastest");
+        sendBluetoothCommand("zz");
     }
 
     public void cmdOne(View view) {
@@ -507,6 +507,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void sendBluetoothCommand(String cmd) {
+
+        cmd = "0" + cmd;
 
         if (connectionThread != null) {
             connectionThread.write(cmd.getBytes());
